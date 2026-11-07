@@ -1,0 +1,8 @@
+{
+	"errors": [
+		{
+			"code": "AssociateNotEligible",
+			"message": "Your account does not currently meet the eligibility requirements to access the API."
+		}
+	]
+}

@@ -1,0 +1,60 @@
+{
+	"itemsResult": {
+		"items": [
+			{
+				"asin": "B0PBXTEST1",
+				"detailPageURL": "https://www.amazon.com/dp/B0PBXTEST1?tag=example-20&linkCode=ogi&th=1&psc=1",
+				"images": {
+					"primary": {
+						"large": { "url": "https://m.media-amazon.com/images/I/41pbxtest1L._SL500_.jpg", "width": 500, "height": 281 }
+					}
+				},
+				"itemInfo": {
+					"title": { "displayValue": "PHILIPS Brilliance 499P9H 49\" SuperWide 32:9 Curved Monitor, 5120x1440", "label": "Title", "locale": "en_US" },
+					"byLineInfo": { "brand": { "displayValue": "PHILIPS", "label": "Brand", "locale": "en_US" } }
+				},
+				"offersV2": {
+					"listings": [
+						{
+							"isBuyBoxWinner": false,
+							"price": { "money": { "amount": 999.99, "currency": "USD", "displayAmount": "$999.99" } },
+							"availability": { "type": "IN_STOCK", "message": "In Stock" }
+						},
+						{
+							"isBuyBoxWinner": true,
+							"price": {
+								"money": { "amount": 927.58, "currency": "USD", "displayAmount": "$927.58" },
+								"savingBasis": { "money": { "amount": 988.15, "currency": "USD", "displayAmount": "$988.15" }, "savingBasisType": "LIST_PRICE" },
+								"savings": { "money": { "amount": 60.57, "currency": "USD", "displayAmount": "$60.57" }, "percentage": 6 }
+							},
+							"availability": { "type": "IN_STOCK", "message": "In Stock" }
+						}
+					]
+				},
+				"customerReviews": { "count": 1234, "starRating": { "value": 4.4 } }
+			},
+			{
+				"asin": "B0PBXTEST2",
+				"detailPageURL": "https://www.amazon.com/dp/B0PBXTEST2?tag=example-20",
+				"itemInfo": {
+					"title": { "displayValue": "Generic USB-C Hub" },
+					"byLineInfo": { "manufacturer": { "displayValue": "Hubco" } }
+				},
+				"offersV2": {
+					"listings": [
+						{
+							"price": { "money": { "amount": 24.5, "currency": "USD" } },
+							"availability": { "type": "OUT_OF_STOCK", "message": "Currently unavailable." }
+						}
+					]
+				}
+			}
+		]
+	},
+	"errors": [
+		{
+			"code": "InvalidParameterValue",
+			"message": "The ItemId B0PBXMISS1 provided in the request is invalid."
+		}
+	]
+}

@@ -1,0 +1,81 @@
+{
+	"name": "@gatilab/emdash-product-box",
+	"version": "0.1.0",
+	"description": "Product box block for EmDash: image, rating, features, pricing, regional affiliate buttons and Product JSON-LD, with optional live Amazon pricing through the Creators API (US and India), cached in plugin storage and refreshed on a schedule. Port of the ACF Blocks Product Box.",
+	"type": "module",
+	"main": "./src/index.ts",
+	"types": "./src/index.ts",
+	"exports": {
+		".": "./src/index.ts",
+		"./core": "./src/core/index.ts",
+		"./astro": "./src/astro/index.ts",
+		"./admin": "./src/admin/index.tsx",
+		"./styles/product-box.css": "./src/astro/product-box.css",
+		"./package.json": "./package.json"
+	},
+	"files": [
+		"src",
+		"README.md",
+		"CHANGELOG.md",
+		"LICENSE"
+	],
+	"sideEffects": [
+		"**/*.css",
+		"**/*.astro"
+	],
+	"keywords": [
+		"emdash",
+		"emdash-plugin",
+		"astro",
+		"portable-text",
+		"product-box",
+		"affiliate",
+		"amazon",
+		"amazon-associates",
+		"creators-api",
+		"json-ld",
+		"schema-org"
+	],
+	"author": "Gatilab (https://gatilab.com)",
+	"license": "MIT",
+	"scripts": {
+		"test": "vitest run",
+		"test:watch": "vitest",
+		"typecheck": "tsc --noEmit && astro check --root . --tsconfig ./tsconfig.json",
+		"prepublishOnly": "pnpm typecheck && pnpm test"
+	},
+	"peerDependencies": {
+		"@cloudflare/kumo": "^2.6.0",
+		"@phosphor-icons/react": "^2.1.10",
+		"astro": "^7.0.0",
+		"emdash": "^1.4.0",
+		"react": ">=19.0.0"
+	},
+	"devDependencies": {
+		"@astrojs/check": "^0.9.10",
+		"@astrojs/react": "^6.0.5",
+		"@cloudflare/kumo": "2.6.0",
+		"@emnapi/runtime": "^1.11.3",
+		"@phosphor-icons/react": "^2.1.10",
+		"@types/node": "^24.0.0",
+		"@types/react": "^19.2.0",
+		"astro": "^7.3.2",
+		"emdash": "^1.4.0",
+		"react": "19.2.4",
+		"react-dom": "19.2.4",
+		"typescript": "^6.0.3",
+		"vitest": "4.1.10"
+	},
+	"publishConfig": {
+		"access": "public"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/gatilab/emdash-product-box.git"
+	},
+	"homepage": "https://github.com/gatilab/emdash-product-box#readme",
+	"bugs": {
+		"url": "https://github.com/gatilab/emdash-product-box/issues"
+	},
+	"packageManager": "pnpm@11.9.0+sha512.bd682d5d03fe525ef7c9fd6780c6884d1e756ac4c9c9fe00c538782824310dcf90e3ddc4f53835f06dfaebd5085e41855e0bcbb3b60de2ac5bbab89e5036f03b"
+}

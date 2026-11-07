@@ -1,0 +1,12 @@
+{
+	"ItemsResult": {
+		"Items": [
+			{
+				"ASIN": "B0PBXTEST3",
+				"DetailPageURL": "https://www.amazon.com/dp/B0PBXTEST3?tag=example-20",
+				"ItemInfo": { "Title": { "DisplayValue": "Legacy-shaped item" } },
+				"OffersV2": { "Listings": [{ "Price": { "Money": { "Amount": 10, "Currency": "USD", "DisplayAmount": "$10.00" } } }] }
+			}
+		]
+	}
+}

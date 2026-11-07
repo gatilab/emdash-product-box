@@ -1,0 +1,23 @@
+{
+	"itemsResult": {
+		"items": [
+			{
+				"asin": "B0PBXTEST1",
+				"detailPageURL": "https://www.amazon.in/dp/B0PBXTEST1?tag=example-21",
+				"itemInfo": { "title": { "displayValue": "PHILIPS Brilliance 49 inch Curved Monitor" } },
+				"offersV2": {
+					"listings": [
+						{
+							"price": {
+								"money": { "amount": 129999, "currency": "INR", "displayAmount": "₹1,29,999.00" },
+								"savingBasis": { "money": { "amount": 149999, "currency": "INR", "displayAmount": "₹1,49,999.00" } }
+							},
+							"availability": { "type": "IN_STOCK", "message": "In stock" }
+						}
+					]
+				},
+				"customerReviews": { "count": 87, "starRating": { "value": 4.1 } }
+			}
+		]
+	}
+}

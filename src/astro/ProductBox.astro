@@ -1,0 +1,259 @@
+---
+/**
+ * Portable Text renderer for the `productBox` block, and the standalone
+ * component (`<ProductBox node={{ _type: "productBox", … }} />`).
+ *
+ * Markup, classes and data attributes follow product-box.php, so the
+ * WordPress block's CSS (and theme overrides written for it) keep applying.
+ * Live Amazon data is read from the plugin's cache while rendering; pass
+ * `live` to supply it yourself (tests, static pages).
+ */
+import "./product-box.css";
+
+import { normalizeBlock } from "../core/fields.js";
+import { icon } from "../core/icons.js";
+import { buildView } from "../core/merge.js";
+import { contrastText, sanitizeHex } from "../core/price.js";
+import { buildProductJsonLd, serializeJsonLd } from "../core/schema.js";
+import { descriptionHtml, linkAttrs } from "../core/text.js";
+import type { ProductBoxBlock } from "../core/types.js";
+import { loadLive, type LiveData } from "./live.js";
+
+interface Props {
+	node: ProductBoxBlock;
+	live?: LiveData;
+	/** Render time override (tests). */
+	now?: number;
+}
+
+const { node, now } = Astro.props;
+const live = Astro.props.live ?? (await loadLive(Astro, node));
+const model = normalizeBlock(node);
+const view = buildView(model, live.products, { now, maxAgeMs: live.maxAgeHours * 3_600_000, locale: Astro.currentLocale ?? "en-US" });
+
+const img = view.image;
+const isTopImage = view.layout === "top-image" && Boolean(img);
+// Falls back to the no-image layout when there is no image.
+const isNoImage = view.layout === "no-image" || !img;
+
+const classes = [
+	"acf-product-box",
+	`has-image-fit-${view.imageFit}`,
+	isTopImage && `has-image-ratio-${view.imageRatio}`,
+	isTopImage && "is-style-top-image",
+	isNoImage && "is-style-no-image",
+	view.label && "has-label",
+	view.badgeText && "has-badge",
+	view.spotlight && "is-spotlight",
+	view.ctaEmphasis && "has-cta-emphasis",
+	view.btnShine && `has-btn-shine-${view.btnShine}`,
+	view.liveProduct && "has-live-price",
+	view.align && `align${view.align}`,
+	view.extraClass,
+]
+	.filter(Boolean)
+	.join(" ");
+
+const onAccent = view.accent ? contrastText(view.accent) : "";
+const wrapperStyle = view.accent
+	? `--pb-accent:${view.accent};--pb-on-accent:${onAccent};--pb-btn-primary-bg:${view.accent};--pb-btn-primary-text:${onAccent};--pb-btn-primary-hover:color-mix(in srgb,${view.accent} 85%,black);--pb-discount-bg:${view.accent};--pb-discount-text:${onAccent}`
+	: undefined;
+const badgeHex = sanitizeHex(view.badgeColor);
+const badgeStyle = `background-color: ${view.badgeColor};${badgeHex ? ` color: ${contrastText(badgeHex)};` : ""}`;
+
+const titleLink = linkAttrs(view.titleRel, view.newTab);
+const hasHeader = view.rank > 0 || view.score > 0;
+const scoreText = view.score.toFixed(view.scoreMax === 100 ? 0 : 1);
+const scorePct = Math.round((view.score / view.scoreMax) * 1000) / 10;
+const ratingText = view.rating.toFixed(1);
+const stars = [1, 2, 3, 4, 5].map((i) => (view.rating >= i ? "full" : view.rating >= i - 0.5 ? "half" : "empty"));
+const hasPrice = Boolean(view.originalPrice || view.currentPrice);
+const description = descriptionHtml(view.description);
+const showAvailability = Boolean(view.liveProduct && view.availabilityMessage && view.availability && view.availability !== "IN_STOCK");
+const hasBottom = hasPrice || description || view.buttons.length > 0 || view.disclosure || view.priceCheckedDate || view.perks.length > 0 || showAvailability;
+const arrow = view.btnArrow ? icon("arrow", "acf-product-box__btn-arrow") : "";
+const jsonLd = view.schema ? buildProductJsonLd(view, { baseUrl: Astro.site ?? Astro.url, includeRating: live.schemaRating }) : null;
+const TitleTag = view.titleTag;
+---
+
+<div
+	class={classes}
+	style={wrapperStyle}
+	id={view.anchor || undefined}
+	data-acf-block="product-box"
+	data-asin={view.amazon?.asin}
+	data-marketplace={view.amazon?.marketplace}
+	data-price-source={view.amazon ? (view.liveProduct?.price ? "amazon" : "manual") : undefined}
+>
+	{view.badgeText && <div class="acf-product-box__badge" style={badgeStyle}>{view.badgeText}</div>}
+
+	{
+		isTopImage && img && (
+			<div class="acf-product-box__hero-image">
+				{view.titleUrl ? (
+					<a class="acf-product-box__image-link" href={view.titleUrl} tabindex="-1" aria-hidden="true" {...titleLink}>
+						<img src={img.src} alt={img.alt} width={img.width} height={img.height} loading="lazy" decoding="async" />
+					</a>
+				) : (
+					<img src={img.src} alt={img.alt} width={img.width} height={img.height} loading="lazy" decoding="async" />
+				)}
+			</div>
+		)
+	}
+
+	<div class="acf-product-box__layout">
+		{
+			!isNoImage && !isTopImage && img && (
+				<div class="acf-product-box__image">
+					{view.titleUrl ? (
+						<a class="acf-product-box__image-link" href={view.titleUrl} tabindex="-1" aria-hidden="true" {...titleLink}>
+							<img src={img.src} alt={img.alt} width={img.width} height={img.height} loading="lazy" decoding="async" />
+						</a>
+					) : (
+						<img src={img.src} alt={img.alt} width={img.width} height={img.height} loading="lazy" decoding="async" />
+					)}
+				</div>
+			)
+		}
+
+		<div class="acf-product-box__content">
+			{view.label && <span class="acf-product-box__label">{view.label}</span>}
+
+			{
+				hasHeader ? (
+					<div class="acf-product-box__header">
+						{view.rank > 0 && (
+							<span class="acf-product-box__rank">
+								<span class="acf-product-box__rank-hash">#</span>
+								{view.rank}
+							</span>
+						)}
+						{view.title && <TitleTag class="acf-product-box__title">{view.titleUrl ? <a href={view.titleUrl} {...titleLink}>{view.title}</a> : view.title}</TitleTag>}
+						{view.score > 0 && (
+							<div class="acf-product-box__score" role="img" aria-label={`${view.scoreLabel}: ${scoreText} out of ${view.scoreMax}`}>
+								<span class="acf-product-box__score-ring" style={`--pb-score:${scorePct}`}>
+									<span class="acf-product-box__score-value">{scoreText}</span>
+								</span>
+								<span class="acf-product-box__score-label">{view.scoreLabel}</span>
+							</div>
+						)}
+					</div>
+				) : (
+					view.title && <TitleTag class="acf-product-box__title">{view.titleUrl ? <a href={view.titleUrl} {...titleLink}>{view.title}</a> : view.title}</TitleTag>
+				)
+			}
+
+			{
+				view.rating > 0 && (
+					<div class="acf-product-box__rating">
+						<span class="acf-product-box__rating-score" aria-hidden="true">{ratingText}</span>
+						<span class="acf-product-box__stars" role="img" aria-label={`Rating: ${ratingText} out of 5`}>
+							{stars.map((s) => <span class={`star star--${s}`} aria-hidden="true">★</span>)}
+						</span>
+						{view.ratingCount && <span class="acf-product-box__rating-count">{view.ratingCount}</span>}
+					</div>
+				)
+			}
+
+			{
+				view.verdict && (
+					<p class="acf-product-box__verdict">
+						<strong class="acf-product-box__verdict-label">{view.verdictLabel}</strong> {view.verdict}
+					</p>
+				)
+			}
+
+			{
+				view.specs.length > 0 && (
+					<ul class="acf-product-box__specs">
+						{view.specs.map((spec) => <li>{spec}</li>)}
+					</ul>
+				)
+			}
+
+			{
+				view.features.length > 0 && (
+					<ul class={`acf-product-box__features${view.features.length >= 6 ? " has-many" : ""}`}>
+						{view.features.map((feature) => <li>{feature}</li>)}
+					</ul>
+				)
+			}
+		</div>
+	</div>
+
+	{
+		hasBottom && (
+			<div class="acf-product-box__bottom">
+				{(hasPrice || view.priceCheckedDate || showAvailability) && (
+					<div class="acf-product-box__price-block">
+						{hasPrice && (
+							<div class="acf-product-box__pricing">
+								{view.originalPrice && <span class="acf-product-box__original-price">{view.originalPrice}</span>}
+								{view.discountPercent && <span class="acf-product-box__discount">{view.discountPercent}</span>}
+								{view.currentPrice && <span class="acf-product-box__current-price">{view.currentPrice}</span>}
+							</div>
+						)}
+						{hasPrice && view.priceNote && <div class="acf-product-box__price-note">{view.priceNote}</div>}
+						{view.savingsText && (
+							<p class="acf-product-box__savings">
+								You save <strong>{view.savingsText}</strong>
+							</p>
+						)}
+						{showAvailability && <p class="acf-product-box__availability">{view.availabilityMessage}</p>}
+						{view.priceCheckedDate && (
+							<p class="acf-product-box__price-checked">
+								Price checked <time datetime={view.priceCheckedDate.iso}>{view.priceCheckedDate.display}</time>
+							</p>
+						)}
+					</div>
+				)}
+
+				{description && <div class="acf-product-box__description" set:html={description} />}
+
+				{view.buttons.length > 0 && (
+					<div class="acf-product-box__buttons">
+						{view.buttons.map((button, index) => {
+							const first = index === 0;
+							const btnClass = [
+								"acf-product-box__btn",
+								`acf-product-box__btn--${button.style}`,
+								`btn-${index + 1}`,
+								view.ctaEmphasis && (first ? "is-emphasized" : "is-quiet"),
+								button.className,
+							]
+								.filter(Boolean)
+								.join(" ");
+							return (
+								<a href={button.url} class={btnClass} data-region={button.region || undefined} {...linkAttrs(button.rel, view.newTab, button.sponsored)}>
+									{button.icon !== "none" && (
+										<>
+											<i class={`md-icon-${button.icon}`} aria-hidden="true" />{" "}
+										</>
+									)}
+									{button.text}
+									{first && arrow && <Fragment set:html={arrow} />}
+									{first && view.btnShine && <span class="acf-product-box__btn-shine" aria-hidden="true" />}
+								</a>
+							);
+						})}
+					</div>
+				)}
+
+				{view.perks.length > 0 && (
+					<ul class="acf-product-box__perks">
+						{view.perks.map((perk) => (
+							<li>
+								<Fragment set:html={icon(perk.icon, "acf-product-box__perk-icon") || icon("check", "acf-product-box__perk-icon")} />
+								{perk.text}
+							</li>
+						))}
+					</ul>
+				)}
+
+				{view.disclosure && <p class="acf-product-box__disclosure">{view.disclosure}</p>}
+			</div>
+		)
+	}
+
+	{jsonLd && <script type="application/ld+json" is:inline set:html={serializeJsonLd(jsonLd)} />}
+</div>
